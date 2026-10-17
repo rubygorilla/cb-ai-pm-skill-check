@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI PM Skill Evidence Check</title>
+<meta name="description" content="Check how much evidence you can show for the 8 skills employers look for in AI Product Managers. Codebasics.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root, :root[data-theme="dark"] {
+    --bg: #19192F;
+    --surface: #222240;
+    --surface-2: #2B2B4D;
+    --line: #3A3A60;
+    --text: #F6F5EE;
+    --muted: #BFBFCB;
+    --green: #92D050;
+    --green-soft: rgba(146, 208, 80, 0.14);
+    --gold: #FFC000;
+    --gold-soft: rgba(255, 192, 0, 0.13);
+    --on-green: #12142A;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    --radar-fill: rgba(146, 208, 80, 0.28);
+  }
+  :root[data-theme="light"] {
+    --bg: #F4F5FA;
+    --surface: #FFFFFF;
+    --surface-2: #EEF0F7;
+    --line: #D9DCE8;
+    --text: #19192F;
+    --muted: #55587A;
+    --green: #2F8F1F;
+    --green-soft: rgba(47, 143, 31, 0.10);
+    --gold: #9A6500;
+    --gold-soft: rgba(196, 135, 0, 0.12);
+    --on-green: #FFFFFF;
+    --shadow: 0 10px 30px rgba(25, 25, 47, 0.10);
+    --radar-fill: rgba(47, 143, 31, 0.22);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Saira", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-weight: 400;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    transition: background .2s, color .2s;
+  }
+  button { font-family: inherit; color: inherit; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 16px 16px 48px; }
+
+  /* Top bar */
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+  .brand { font-weight: 600; font-size: 15px; letter-spacing: .02em; color: var(--muted); }
+  .brand b { color: var(--green); font-weight: 600; }
+  .theme-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+    padding: 7px 14px; font-size: 14px; cursor: pointer;
+  }
+  .theme-btn svg { width: 16px; height: 16px; }
+
+  .screen { display: none; animation: fade .25s ease; }
+  .screen.active { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  h1 { font-weight: 600; font-size: clamp(28px, 7vw, 38px); line-height: 1.15; margin: 8px 0 14px; color: var(--green); }
+  h2 { font-weight: 600; font-size: clamp(22px, 5.6vw, 28px); line-height: 1.2; margin: 0 0 8px; }
+  h3 { font-weight: 600; font-size: 18px; margin: 0 0 6px; }
+  p { margin: 0 0 12px; }
+  .lead { font-size: 18px; }
+  .muted { color: var(--muted); }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+    padding: 18px; box-shadow: var(--shadow);
+  }
+  .rules { list-style: none; padding: 0; margin: 18px 0 22px; display: grid; gap: 10px; }
+  .rules li { display: flex; gap: 12px; align-items: flex-start; font-size: 16px; }
+  .rules .dot { flex: 0 0 26px; height: 26px; border-radius: 50%; background: var(--green-soft); color: var(--green); display: grid; place-items: center; font-weight: 600; font-size: 14px; }
+
+  .levels-preview { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 6px 0 4px; }
+  .levels-preview span { background: var(--surface-2); border-radius: 10px; padding: 8px 10px; font-size: 14px; }
+  .levels-preview b { color: var(--green); font-weight: 600; margin-right: 6px; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    border: none; border-radius: 12px; padding: 14px 22px; font-size: 17px; font-weight: 600;
+    cursor: pointer; transition: transform .08s, opacity .2s;
+  }
+  .btn:active { transform: scale(.98); }
+  .btn-primary { background: var(--green); color: var(--on-green); width: 100%; }
+  .btn-ghost { background: transparent; border: 1px solid var(--line); color: var(--text); }
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* Question screen */
+  .progress-meta { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: var(--muted); margin-bottom: 8px; }
+  .bar { height: 6px; background: var(--surface-2); border-radius: 99px; overflow: hidden; margin-bottom: 22px; }
+  .bar > i { display: block; height: 100%; background: var(--green); width: 0; transition: width .3s ease; }
+  .skill-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 4px; }
+  .skill-num { font-size: 44px; font-weight: 400; color: var(--muted); line-height: 1; }
+  .skill-name { color: var(--green); }
+  .skill-q { font-size: 18px; margin: 4px 0 18px; }
+  .options { display: grid; gap: 10px; }
+  .opt {
+    text-align: left; background: var(--surface); border: 1.5px solid var(--line); border-radius: 14px;
+    padding: 13px 14px; cursor: pointer; display: grid; grid-template-columns: 30px 1fr; gap: 12px; align-items: start;
+    transition: border-color .15s, background .15s;
+  }
+  .opt:hover { border-color: var(--green); }
+  .opt.selected { border-color: var(--green); background: var(--green-soft); }
+  .opt .lv { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--line); display: grid; place-items: center; font-weight: 600; font-size: 14px; color: var(--muted); }
+  .opt.selected .lv { background: var(--green); border-color: var(--green); color: var(--on-green); }
+  .opt .lname { display: block; font-weight: 600; font-size: 16px; }
+  .opt .ldesc { display: block; font-size: 15px; color: var(--muted); margin-top: 1px; }
+  .q-nav { display: flex; justify-content: space-between; margin-top: 16px; }
+  .link-btn { background: none; border: none; color: var(--muted); font-size: 15px; cursor: pointer; padding: 8px 0; }
+  .link-btn:disabled { opacity: .35; cursor: default; }
+
+  /* Result */
+  .result-head { text-align: center; margin-bottom: 18px; }
+  .kicker { font-size: 14px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .big-stat { font-size: clamp(26px, 6.5vw, 34px); font-weight: 600; line-height: 1.2; margin: 6px 0 10px; }
+  .big-stat em { font-style: normal; color: var(--green); }
+  .profile-pill { display: inline-block; padding: 6px 14px; border-radius: 999px; font-weight: 600; background: var(--green-soft); color: var(--green); }
+  .profile-pill.gold { background: var(--gold-soft); color: var(--gold); }
+  .profile-desc { margin-top: 10px; color: var(--muted); }
+  .radar-card { padding: 10px 6px 6px; margin-bottom: 18px; }
+  #radar { width: 100%; height: auto; display: block; }
+  #radar text { font-family: "Saira", sans-serif; }
+  .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 14px; font-size: 13px; color: var(--muted); padding: 4px 12px 10px; }
+  .legend b { color: var(--text); font-weight: 600; }
+  .section-title { font-size: 20px; font-weight: 600; margin: 26px 0 10px; }
+  .focus { margin-bottom: 14px; border-left: 4px solid var(--gold); }
+  .focus .tag { display: inline-block; font-size: 13px; font-weight: 600; color: var(--gold); background: var(--gold-soft); padding: 3px 10px; border-radius: 99px; margin-bottom: 8px; }
+  .focus .why { color: var(--muted); font-size: 15px; }
+  .blk { margin-top: 12px; }
+  .blk-label { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--green); margin-bottom: 2px; }
+  .blk p { margin: 0; font-size: 16px; }
+  .cohort { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--line); font-size: 14px; color: var(--muted); }
+  .strength { border-left: 4px solid var(--green); margin-bottom: 12px; }
+  .actions { display: grid; gap: 10px; margin-top: 24px; }
+  .toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%) translateY(30px); background: var(--text); color: var(--bg); padding: 10px 18px; border-radius: 10px; font-size: 15px; opacity: 0; transition: .25s; pointer-events: none; z-index: 10; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .foot { text-align: center; font-size: 13px; color: var(--muted); margin-top: 28px; }
+  @media (min-width: 560px) { .wrap { padding-top: 28px; } }
+</style>
+<script>
+  (function () {
+    try { var t = localStorage.getItem("cb-sec-theme"); if (t) document.documentElement.setAttribute("data-theme", t); } catch (e) {}
+  })();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><b>Codebasics</b> &middot; AI PM</div>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Switch colour theme">
+      <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+      <span id="themeLabel">Light</span>
+    </button>
+  </div>
+
+  <!-- Intro -->
+  <section class="screen active" id="intro">
+    <h1>AI PM Skill Evidence Check</h1>
+    <p class="lead">Employers don't hire for what you know. They hire for what you can show. Let's find out where your evidence is.</p>
+    <div class="card">
+      <ul class="rules">
+        <li><span class="dot">1</span><span>8 skills, one screen each. About 3 minutes.</span></li>
+        <li><span class="dot">2</span><span>Work in a job, a course or a side project all count.</span></li>
+        <li><span class="dot">3</span><span>If you couldn't show it in an interview, don't claim it.</span></li>
+        <li><span class="dot">4</span><span>Nothing is stored. Nobody sees your answers. Be honest.</span></li>
+      </ul>
+      <div class="muted" style="font-size:14px;margin-bottom:6px">For each skill, pick one level:</div>
+      <div class="levels-preview">
+        <span><b>0</b>New to this</span>
+        <span><b>1</b>Can explain it</span>
+        <span><b>2</b>Done it once</span>
+        <span><b>3</b>Can show evidence</span>
+      </div>
+    </div>
+    <div style="margin-top:20px"><button class="btn btn-primary" id="startBtn" type="button">Start</button></div>
+  </section>
+
+  <!-- Question -->
+  <section class="screen" id="quiz">
+    <div class="progress-meta"><span id="progText">Skill 1 of 8</span><span id="progPct"></span></div>
+    <div class="bar"><i id="progBar"></i></div>
+    <div class="skill-head"><span class="skill-num" id="qNum">01</span><h2 class="skill-name" id="qName"></h2></div>
+    <p class="skill-q" id="qQuestion"></p>
+    <div class="options" id="qOptions" role="radiogroup"></div>
+    <div class="q-nav">
+      <button class="link-btn" id="backBtn" type="button">&larr; Back</button>
+      <button class="link-btn" id="nextBtn" type="button" disabled>Next &rarr;</button>
+    </div>
+  </section>
+
+  <!-- Result -->
+  <section class="screen" id="result">
+    <div class="result-head">
+      <div class="kicker">Your result</div>
+      <div class="big-stat" id="rStat"></div>
+      <span class="profile-pill" id="rProfile"></span>
+      <p class="profile-desc" id="rProfileDesc"></p>
+    </div>
+    <div class="card radar-card">
+      <svg id="radar" viewBox="0 0 420 330" role="img" aria-label="Radar chart of your 8 skill levels"></svg>
+      <div class="legend" id="legend"></div>
+    </div>
+
+    <div class="section-title">Your 2 focus skills</div>
+    <div id="focusList"></div>
+
+    <div id="strengthWrap">
+      <div class="section-title">Your strengths</div>
+      <div id="strengthList"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="saveBtn" type="button">Save my plan as an image</button>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="copyBtn" type="button">Copy as text</button>
+        <button class="btn btn-ghost" id="retakeBtn" type="button">Retake</button>
+      </div>
+    </div>
+    <div class="foot">Codebasics &middot; 8 Skills to get hired as an AI PM</div>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const LEVELS = ["New to this", "Can explain it", "Done it once", "Can show evidence"];
+
+const SKILLS = [
+  { short: "Judgement", name: "Product judgement", q: "Which problem is worth solving with AI?",
+    d: ["Haven't judged whether a problem suits AI", "Can explain what makes a problem worth solving with AI", "Have picked and justified one AI opportunity", "Have a written opportunity brief I can share"],
+    why: "Interviewers test whether you pick the right problem before the right model.",
+    task: "Pick an app you use often and list 5 repeated user complaints. Choose one where AI clearly helps and write a half-page brief: who has the problem, how often, why AI fits and what success looks like.",
+    evidence: "A clear opportunity brief",
+    cohort: "Discovery, the AI PRD and the capstone" },
+  { short: "AI", name: "AI understanding", q: "What can the technology reliably do here?",
+    d: ["Know AI tools only as a user", "Can explain what LLMs do well and where they fail", "Have built a small AI prototype once", "Have a prototype and can explain why I built it that way"],
+    why: "You need to know what the technology can reliably do before you promise it.",
+    task: "Load 5 documents into a free tool (NotebookLM, a custom GPT or a Claude Project) and ask it 10 questions. Note 3 answers it got right and 2 it got wrong, and explain why.",
+    evidence: "A prototype and explained choices",
+    cohort: "the RAG chatbot and agent builds" },
+  { short: "Data", name: "Data understanding", q: "Does the AI have information it can trust?",
+    d: ["Haven't thought about the data behind an AI feature", "Can explain why outdated or restricted data is risky", "Have reviewed the data sources for an AI feature", "Have a data readiness checklist I made"],
+    why: "Many AI failures trace back to the information the AI was given.",
+    task: "Take 5 documents an AI would rely on and make a table: source, is it current, is it approved, does it hold sensitive data, and your decision (use, review or restrict).",
+    evidence: "A data readiness checklist",
+    cohort: "the data readiness and evaluation sessions" },
+  { short: "Testing", name: "Testing AI quality", q: "How will we know the answer is good enough?",
+    d: ["Would check AI output by eye", "Can explain test cases and acceptance criteria for AI", "Have written and run test cases for an AI feature", "Have a test set with results and a pass bar"],
+    why: "“It looked fine” is not a launch decision. Test results are.",
+    task: "Write 10 test cases for an AI feature, including 3 where the answer is not in its data. Run them, mark each pass or fail, and set your pass bar.",
+    evidence: "Test cases and acceptance criteria",
+    cohort: "the data readiness and evaluation sessions" },
+  { short: "Trust", name: "Trust and safety", q: "When should a human step in?",
+    d: ["Haven't planned for AI going wrong", "Can explain when a human should step in", "Have listed failure modes for an AI feature", "Have a failure-mode and escalation plan"],
+    why: "Teams hire PMs who plan for failure before users find it.",
+    task: "List 5 ways an AI feature could fail. For each, rate how harmful it is and decide whether the AI acts on its own, drafts for a human, or hands off.",
+    evidence: "A failure-mode and escalation plan",
+    cohort: "the guardrails and cost modelling sessions" },
+  { short: "Workflow", name: "AI workflow design", q: "How does AI fit into the actual work?",
+    d: ["See AI as a standalone feature", "Can explain where AI fits in a real workflow", "Have mapped a workflow with AI steps in it", "Have a workflow map and a working prototype"],
+    why: "AI creates value only when it fits the work people actually do.",
+    task: "Map a real process at your work or college step by step. Mark where AI fits, what information and permissions it needs, and what happens when it fails.",
+    evidence: "A workflow and working prototype",
+    cohort: "the RAG chatbot and agent builds" },
+  { short: "Trade-offs", name: "Business trade-offs", q: "What balance of quality, speed and cost fits?",
+    d: ["Haven't compared AI options on cost", "Can explain the quality, speed and cost trade-off", "Have compared 2 AI options on real numbers", "Have a cost model with a justified recommendation"],
+    why: "Every AI choice costs money and time. The PM owns the balance.",
+    task: "Run the same 10 test cases through 2 AI models. Record cost per request (from public pricing), response time and pass rate, then write a 3-line recommendation.",
+    evidence: "A cost model and a justified recommendation",
+    cohort: "the guardrails and cost modelling sessions" },
+  { short: "Execution", name: "Execution and leadership", q: "How do we align people and ship responsibly?",
+    d: ["Haven't planned an AI rollout", "Can explain why AI launches start as pilots", "Have planned or run an AI pilot with others", "Have a roadmap and a stakeholder decision story"],
+    why: "AI launches need engineering, operations, risk and compliance to agree.",
+    task: "Write a one-page pilot plan: scope, users, success metric, review date, criteria to expand or stop, and the stakeholders who must agree.",
+    evidence: "A roadmap and stakeholder decision story",
+    cohort: "Discovery, the AI PRD and the capstone" }
+];
+
+const PROFILES = [
+  { max: 8,  name: "Starting out",    gold: true,  desc: "You know where the gaps are, which is the right place to begin. One small project can move several skills at once." },
+  { max: 16, name: "Building",        gold: true,  desc: "You can talk about most skills. The next step is turning that into evidence you can put in front of an interviewer." },
+  { max: 24, name: "Interview-ready", gold: false, desc: "You have real evidence across most skills. Sharpen the weakest ones and practise explaining your decisions." }
+];
+
+const answers = new Array(SKILLS.length).fill(null);
+let current = 0;
+let advanceTimer = null;
+
+const $ = (id) => document.getElementById(id);
+const pad = (n) => String(n).padStart(2, "0");
+
+/* ---------- Theme ---------- */
+const ICON_SUN = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
+const ICON_MOON = '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>';
+function paintThemeBtn() {
+  const dark = document.documentElement.getAttribute("data-theme") !== "light";
+  $("themeIcon").innerHTML = dark ? ICON_SUN : ICON_MOON;
+  $("themeLabel").textContent = dark ? "Light" : "Dark";
+}
+$("themeBtn").addEventListener("click", () => {
+  const next = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("cb-sec-theme", next); } catch (e) {}
+  paintThemeBtn();
+  if ($("result").classList.contains("active")) drawRadar();
+});
+paintThemeBtn();
+
+/* ---------- Navigation ---------- */
+function show(id) {
+  document.querySelectorAll(".screen").forEach((s) => s.classList.toggle("active", s.id === id));
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+$("startBtn").addEventListener("click", () => { current = 0; renderQuestion(); show("quiz"); });
+
+function renderQuestion() {
+  const s = SKILLS[current];
+  $("progText").textContent = "Skill " + (current + 1) + " of " + SKILLS.length;
+  $("progPct").textContent = answers.filter((a) => a !== null).length + " answered";
+  $("progBar").style.width = ((current) / SKILLS.length * 100) + "%";
+  $("qNum").textContent = pad(current + 1);
+  $("qName").textContent = s.name;
+  $("qQuestion").textContent = s.q;
+  const box = $("qOptions");
+  box.innerHTML = "";
+  LEVELS.forEach((lname, i) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "opt" + (answers[current] === i ? " selected" : "");
+    b.setAttribute("role", "radio");
+    b.setAttribute("aria-checked", answers[current] === i ? "true" : "false");
+    b.innerHTML = '<span class="lv">' + i + '</span><span><span class="lname">' + lname + '</span><span class="ldesc">' + s.d[i] + '</span></span>';
+    b.addEventListener("click", () => choose(i));
+    box.appendChild(b);
+  });
+  $("backBtn").textContent = current === 0 ? "← Intro" : "← Back";
+  $("nextBtn").disabled = answers[current] === null;
+  $("nextBtn").textContent = current === SKILLS.length - 1 ? "See result →" : "Next →";
+}
+
+function choose(i) {
+  answers[current] = i;
+  renderQuestion();
+  clearTimeout(advanceTimer);
+  advanceTimer = setTimeout(next, 320);
+}
+function next() {
+  clearTimeout(advanceTimer);
+  if (answers[current] === null) return;
+  if (current < SKILLS.length - 1) { current++; renderQuestion(); window.scrollTo({ top: 0 }); }
+  else { $("progBar").style.width = "100%"; renderResult(); show("result"); }
+}
+$("nextBtn").addEventListener("click", next);
+$("backBtn").addEventListener("click", () => {
+  clearTimeout(advanceTimer);
+  if (current === 0) { show("intro"); return; }
+  current--; renderQuestion();
+});
+$("retakeBtn").addEventListener("click", () => {
+  answers.fill(null); current = 0; renderQuestion(); show("intro");
+});
+
+/* ---------- Scoring ---------- */
+function computeResult() {
+  const total = answers.reduce((a, b) => a + b, 0);
+  const evidenceCount = answers.filter((a) => a === 3).length;
+  const profile = PROFILES.find((p) => total <= p.max);
+  const idx = SKILLS.map((_, i) => i);
+  // Focus: lowest scores, ties broken by deck order (01 first)
+  const focus = idx.slice().sort((a, b) => answers[a] - answers[b] || a - b).slice(0, 2);
+  const allMax = answers.every((a) => a === 3);
+  // Strengths: highest scores at level 2+, ties by deck order, excluding focus skills
+  const strengths = idx.filter((i) => answers[i] >= 2 && (allMax || !focus.includes(i)))
+    .sort((a, b) => answers[b] - answers[a] || a - b).slice(0, 2);
+  return { total, evidenceCount, profile, focus, allMax, strengths };
+}
+
+/* ---------- Result ---------- */
+function esc(t) { return String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+function renderResult() {
+  const r = computeResult();
+  $("rStat").innerHTML = "You have evidence for <em>" + r.evidenceCount + " of 8</em> skills";
+  const pill = $("rProfile");
+  pill.textContent = r.profile.name + " · " + r.total + "/24";
+  pill.className = "profile-pill" + (r.profile.gold ? " gold" : "");
+  $("rProfileDesc").textContent = r.profile.desc;
+  drawRadar();
+  $("legend").innerHTML = SKILLS.map((s, i) => "<span>" + pad(i + 1) + " " + esc(s.short) + ": <b>" + LEVELS[answers[i]] + "</b></span>").join("");
+
+  const fl = $("focusList");
+  if (r.allMax) {
+    fl.innerHTML = '<div class="card focus"><span class="tag">Pressure-test</span><h3>You rated every skill at the top level</h3>' +
+      '<p class="why">Pick the skill you would least like to be grilled on in an interview. Rebuild that evidence from scratch and ask a peer to challenge every decision in it.</p></div>';
+  } else {
+    fl.innerHTML = r.focus.map((i, k) => {
+      const s = SKILLS[i];
+      return '<div class="card focus">' +
+        '<span class="tag">Focus ' + (k + 1) + ' · ' + LEVELS[answers[i]] + '</span>' +
+        '<h3>' + pad(i + 1) + ' ' + esc(s.name) + '</h3>' +
+        '<p class="why">' + esc(s.why) + '</p>' +
+        '<div class="blk"><div class="blk-label">This week’s practice task</div><p>' + esc(s.task) + '</p></div>' +
+        '<div class="blk"><div class="blk-label">Evidence to build</div><p>' + esc(s.evidence) + '</p></div>' +
+        '<div class="cohort">In the Codebasics AI PM Bootcamp, this is practised in ' + esc(s.cohort) + '.</div>' +
+        '</div>';
+    }).join("");
+  }
+
+  if (r.strengths.length) {
+    $("strengthWrap").style.display = "";
+    $("strengthList").innerHTML = r.strengths.map((i) => {
+      const s = SKILLS[i];
+      return '<div class="card strength"><h3>' + pad(i + 1) + ' ' + esc(s.name) + '</h3>' +
+        '<p class="why muted" style="margin:0">Turn this into a 2-minute interview story: the situation, the decision you made, the result, and what you would change next time.</p></div>';
+    }).join("");
+  } else {
+    $("strengthWrap").style.display = "none";
+  }
+}
+
+function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+function radarGeometry(cx, cy, R) {
+  const n = SKILLS.length;
+  return SKILLS.map((_, i) => {
+    const a = -Math.PI / 2 + i * 2 * Math.PI / n;
+    return { a, cos: Math.cos(a), sin: Math.sin(a) };
+  }).map((g) => ({ ...g, x: (lv) => cx + g.cos * R * lv / 3, y: (lv) => cy + g.sin * R * lv / 3 }));
+}
+
+function drawRadar() {
+  const svg = $("radar");
+  const cx = 210, cy = 165, R = 112;
+  const G = radarGeometry(cx, cy, R);
+  const line = cssVar("--line"), muted = cssVar("--muted"), text = cssVar("--text"), green = cssVar("--green"), fill = cssVar("--radar-fill");
+  let h = "";
+  for (let lv = 1; lv <= 3; lv++) {
+    h += '<polygon points="' + G.map((g) => g.x(lv).toFixed(1) + "," + g.y(lv).toFixed(1)).join(" ") + '" fill="none" stroke="' + line + '" stroke-width="1"/>';
+  }
+  G.forEach((g) => { h += '<line x1="' + cx + '" y1="' + cy + '" x2="' + g.x(3).toFixed(1) + '" y2="' + g.y(3).toFixed(1) + '" stroke="' + line + '" stroke-width="1"/>'; });
+  for (let lv = 1; lv <= 3; lv++) {
+    h += '<text x="' + (cx + 4) + '" y="' + (cy - R * lv / 3 + 11) + '" font-size="10" fill="' + muted + '">' + lv + '</text>';
+  }
+  const vals = answers.map((a) => (a === null ? 0 : a));
+  // Draw a tiny minimum so a zero still shows a visible shape at the centre
+  const pts = G.map((g, i) => { const v = Math.max(vals[i], 0.08); return g.x(v).toFixed(1) + "," + g.y(v).toFixed(1); }).join(" ");
+  h += '<polygon points="' + pts + '" fill="' + fill + '" stroke="' + green + '" stroke-width="2.5" stroke-linejoin="round"/>';
+  G.forEach((g, i) => { h += '<circle cx="' + g.x(Math.max(vals[i], 0.08)).toFixed(1) + '" cy="' + g.y(Math.max(vals[i], 0.08)).toFixed(1) + '" r="4" fill="' + green + '"/>'; });
+  G.forEach((g, i) => {
+    const lx = cx + g.cos * (R + 22), ly = cy + g.sin * (R + 22);
+    const anchor = Math.abs(g.cos) < 0.2 ? "middle" : (g.cos > 0 ? "start" : "end");
+    const dy = g.sin > 0.5 ? 12 : (g.sin < -0.5 ? -2 : 5);
+    h += '<text x="' + lx.toFixed(1) + '" y="' + (ly + dy).toFixed(1) + '" text-anchor="' + anchor + '" font-size="13" font-weight="500" fill="' + text + '">' +
+      '<tspan fill="' + muted + '">' + pad(i + 1) + ' </tspan>' + esc(SKILLS[i].short) + '</text>';
+  });
+  svg.innerHTML = h;
+}
+
+/* ---------- Copy as text ---------- */
+function planText() {
+  const r = computeResult();
+  let t = "My AI PM Skill Evidence Check\n";
+  t += "Evidence for " + r.evidenceCount + " of 8 skills · " + r.profile.name + " (" + r.total + "/24)\n\n";
+  SKILLS.forEach((s, i) => { t += pad(i + 1) + " " + s.name + ": " + LEVELS[answers[i]] + "\n"; });
+  t += "\n";
+  if (r.allMax) {
+    t += "Next: pick the skill I'd least like to be grilled on and rebuild that evidence.\n";
+  } else {
+    r.focus.forEach((i, k) => {
+      const s = SKILLS[i];
+      t += "FOCUS " + (k + 1) + ": " + s.name + "\n";
+      t += "This week: " + s.task + "\n";
+      t += "Evidence to build: " + s.evidence + "\n\n";
+    });
+  }
+  t += "Codebasics · 8 Skills to get hired as an AI PM";
+  return t;
+}
+function toast(msg) { const el = $("toast"); el.textContent = msg; el.classList.add("show"); setTimeout(() => el.classList.remove("show"), 2200); }
+$("copyBtn").addEventListener("click", async () => {
+  const t = planText();
+  try { await navigator.clipboard.writeText(t); toast("Plan copied"); }
+  catch (e) {
+    const ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); toast("Plan copied"); } catch (e2) { toast("Copy not supported here"); }
+    ta.remove();
+  }
+});
+
+/* ---------- Save as image ---------- */
+function wrapLines(ctx, text, maxW) {
+  const words = text.split(" "); const lines = []; let line = "";
+  words.forEach((w) => {
+    const test = line ? line + " " + w : w;
+    if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = w; } else { line = test; }
+  });
+  if (line) lines.push(line);
+  return lines;
+}
+function drawWrapped(ctx, text, x, y, maxW, lh) {
+  const lines = wrapLines(ctx, text, maxW);
+  lines.forEach((l, i) => ctx.fillText(l, x, y + i * lh));
+  return y + lines.length * lh;
+}
+
+async function buildImage() {
+  try { await document.fonts.ready; } catch (e) {}
+  const r = computeResult();
+  const W = 1080, PADX = 70, F = '"Saira", system-ui, sans-serif';
+  const C = { bg: "#19192F", surface: "#222240", line: "#3A3A60", text: "#F6F5EE", muted: "#BFBFCB", green: "#92D050", gold: "#FFC000" };
+  // Measure pass to size canvas height
+  const tmp = document.createElement("canvas").getContext("2d");
+  const focusBlocks = r.allMax ? [] : r.focus.map((i) => SKILLS[i]);
+  let est = 1080;
+  tmp.font = "400 28px " + F;
+  focusBlocks.forEach((s) => { est += 150 + wrapLines(tmp, s.task, W - PADX * 2 - 60).length * 40; });
+  if (r.allMax) est += 220;
+  const H = Math.max(1350, est + 90);
+
+  const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+  const ctx = cv.getContext("2d");
+  ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
+  ctx.textBaseline = "alphabetic";
+
+  ctx.fillStyle = C.muted; ctx.font = "500 26px " + F; ctx.fillText("Codebasics · AI PM Skill Evidence Check", PADX, 90);
+  ctx.fillStyle = C.text; ctx.font = "600 52px " + F;
+  ctx.fillText("Evidence for ", PADX, 170);
+  let w = ctx.measureText("Evidence for ").width;
+  ctx.fillStyle = C.green; ctx.fillText(r.evidenceCount + " of 8", PADX + w, 170);
+  w += ctx.measureText(r.evidenceCount + " of 8").width;
+  ctx.fillStyle = C.text; ctx.fillText(" skills", PADX + w, 170);
+  ctx.fillStyle = r.profile.gold ? C.gold : C.green; ctx.font = "600 32px " + F;
+  ctx.fillText(r.profile.name + " · " + r.total + "/24", PADX, 222);
+
+  // Radar
+  const cx = W / 2, cy = 560, R = 220;
+  const G = radarGeometry(cx, cy, R);
+  ctx.strokeStyle = C.line; ctx.lineWidth = 2;
+  for (let lv = 1; lv <= 3; lv++) {
+    ctx.beginPath(); G.forEach((g, i) => { i ? ctx.lineTo(g.x(lv), g.y(lv)) : ctx.moveTo(g.x(lv), g.y(lv)); }); ctx.closePath(); ctx.stroke();
+  }
+  G.forEach((g) => { ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(g.x(3), g.y(3)); ctx.stroke(); });
+  ctx.beginPath();
+  G.forEach((g, i) => { const v = Math.max(answers[i], 0.08); i ? ctx.lineTo(g.x(v), g.y(v)) : ctx.moveTo(g.x(v), g.y(v)); });
+  ctx.closePath(); ctx.fillStyle = "rgba(146,208,80,0.28)"; ctx.fill(); ctx.strokeStyle = C.green; ctx.lineWidth = 5; ctx.stroke();
+  G.forEach((g, i) => { const v = Math.max(answers[i], 0.08); ctx.beginPath(); ctx.arc(g.x(v), g.y(v), 8, 0, Math.PI * 2); ctx.fillStyle = C.green; ctx.fill(); });
+  ctx.font = "500 28px " + F;
+  G.forEach((g, i) => {
+    const lx = cx + g.cos * (R + 36), ly = cy + g.sin * (R + 36);
+    ctx.textAlign = Math.abs(g.cos) < 0.2 ? "center" : (g.cos > 0 ? "left" : "right");
+    const dy = g.sin > 0.5 ? 22 : (g.sin < -0.5 ? -4 : 10);
+    ctx.fillStyle = C.text; ctx.fillText(pad(i + 1) + " " + SKILLS[i].short, lx, ly + dy);
+  });
+  ctx.textAlign = "left";
+
+  let y = 900;
+  ctx.fillStyle = C.text; ctx.font = "600 36px " + F;
+  ctx.fillText(r.allMax ? "My next step" : "My 2 focus skills", PADX, y); y += 30;
+  if (r.allMax) {
+    ctx.fillStyle = C.muted; ctx.font = "400 28px " + F;
+    y = drawWrapped(ctx, "Pick the skill I'd least like to be grilled on in an interview and rebuild that evidence from scratch.", PADX, y + 40, W - PADX * 2, 40);
+  }
+  focusBlocks.forEach((s) => {
+    const i = SKILLS.indexOf(s);
+    ctx.font = "400 28px " + F;
+    const taskLines = wrapLines(ctx, s.task, W - PADX * 2 - 60);
+    const boxH = 150 + taskLines.length * 40;
+    y += 24;
+    ctx.fillStyle = C.surface; ctx.fillRect(PADX, y, W - PADX * 2, boxH);
+    ctx.fillStyle = C.gold; ctx.fillRect(PADX, y, 8, boxH);
+    let ty = y + 52;
+    ctx.fillStyle = C.text; ctx.font = "600 32px " + F; ctx.fillText(pad(i + 1) + " " + s.name, PADX + 34, ty);
+    ctx.fillStyle = C.gold; ctx.font = "500 24px " + F;
+    const lvl = LEVELS[answers[i]];
+    ctx.textAlign = "right"; ctx.fillText(lvl, W - PADX - 26, ty); ctx.textAlign = "left";
+    ty += 46; ctx.fillStyle = C.green; ctx.font = "600 22px " + F; ctx.fillText("THIS WEEK", PADX + 34, ty);
+    ty += 38; ctx.fillStyle = C.text; ctx.font = "400 28px " + F;
+    taskLines.forEach((l, k) => ctx.fillText(l, PADX + 34, ty + k * 40));
+    ty += taskLines.length * 40;
+    ctx.fillStyle = C.muted; ctx.font = "500 24px " + F; ctx.fillText("Evidence to build: " + s.evidence, PADX + 34, ty + 2);
+    y += boxH;
+  });
+  ctx.fillStyle = C.muted; ctx.font = "400 22px " + F;
+  ctx.fillText("Codebasics · 8 Skills to get hired as an AI PM", PADX, H - 44);
+  return cv;
+}
+
+$("saveBtn").addEventListener("click", async () => {
+  const btn = $("saveBtn"); btn.disabled = true; btn.style.opacity = .7;
+  try {
+    const cv = await buildImage();
+    const blob = await new Promise((res) => cv.toBlob(res, "image/png"));
+    const file = new File([blob], "ai-pm-skill-plan.png", { type: "image/png" });
+    const touch = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+    if (touch && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: "My AI PM skill plan" }); }
+      catch (e) { if (e && e.name !== "AbortError") downloadBlob(blob); }
+    } else {
+      downloadBlob(blob);
+    }
+  } catch (e) {
+    toast("Couldn't create the image. Take a screenshot instead.");
+  }
+  btn.disabled = false; btn.style.opacity = 1;
+});
+function downloadBlob(blob) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = url; a.download = "ai-pm-skill-plan.png";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  toast("Image saved");
+}
+</script>
+</body>
+</html>
