@@ -147,6 +147,39 @@
   .actions { display: grid; gap: 10px; margin-top: 24px; }
   .toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%) translateY(30px); background: var(--text); color: var(--bg); padding: 10px 18px; border-radius: 10px; font-size: 15px; opacity: 0; transition: .25s; pointer-events: none; z-index: 10; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  /* Interviewer card */
+  .ask-card { margin-top: 14px; border-radius: 14px; padding: 16px; background: var(--surface-2); border: 1px solid var(--line); border-left: 4px solid var(--green); animation: flipIn .35s ease; }
+  @keyframes flipIn { from { opacity: 0; transform: perspective(600px) rotateX(-12deg) translateY(8px); } to { opacity: 1; transform: none; } }
+  .ask-label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--green); margin-bottom: 6px; }
+  .ask-label svg { width: 18px; height: 18px; }
+  .ask-q { font-size: 18px; font-weight: 500; line-height: 1.35; margin: 0 0 10px; }
+  .ask-note { font-size: 15px; color: var(--muted); margin: 0 0 12px; }
+  .ask-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .ask-btns .btn, .ask-next { padding: 12px 14px; font-size: 16px; }
+  .ask-next { width: 100%; }
+  /* Type badge */
+  .badge-wrap { position: relative; display: flex; flex-direction: column; align-items: center; margin: 4px 0 14px; }
+  .badge { width: 104px; height: 104px; border-radius: 50%; display: grid; place-items: center; background: var(--green-soft); border: 2px solid var(--green); color: var(--green); transform: scale(.4); opacity: 0; }
+  .badge svg { width: 52px; height: 52px; }
+  .badge.pop { animation: pop .6s cubic-bezier(.2,1.6,.4,1) forwards; }
+  @keyframes pop { to { transform: scale(1); opacity: 1; } }
+  .type-kicker { margin-top: 12px; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .type-name { font-size: clamp(26px, 7vw, 34px); font-weight: 600; color: var(--green); line-height: 1.15; margin: 2px 0 4px; }
+  .type-line { color: var(--text); font-size: 16px; max-width: 420px; margin: 0 auto; }
+  .fade-up { opacity: 0; transform: translateY(8px); }
+  .fade-up.show { opacity: 1; transform: none; transition: opacity .45s ease, transform .45s ease; }
+  .burst { position: absolute; top: 52px; left: 50%; width: 0; height: 0; pointer-events: none; }
+  .burst i { position: absolute; width: 8px; height: 8px; border-radius: 2px; background: var(--green); opacity: 0; animation: fly .9s ease-out forwards; }
+  .burst i:nth-child(3n) { background: var(--gold); }
+  @keyframes fly { 0% { opacity: 1; transform: translate(0,0) rotate(0); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(220deg); } }
+  .divider { height: 1px; background: var(--line); margin: 16px 0 14px; }
+  .ask-mini { margin-top: 12px; padding: 10px 12px; border-radius: 10px; background: var(--surface-2); font-size: 15px; }
+  .ask-mini b { display: block; font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--green); margin-bottom: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    .ask-card, .badge.pop, .burst i { animation: none !important; }
+    .badge { transform: none; opacity: 1; }
+    .fade-up { opacity: 1; transform: none; }
+  }
   .foot { text-align: center; font-size: 13px; color: var(--muted); margin-top: 28px; }
   @media (min-width: 560px) { .wrap { padding-top: 28px; } }
 </style>
@@ -172,10 +205,12 @@
     <p class="lead">Employers don't hire for what you know. They hire for what you can show. Let's find out where your evidence is.</p>
     <div class="card">
       <ul class="rules">
-        <li><span class="dot">1</span><span>8 skills, one screen each. About 3 minutes.</span></li>
-        <li><span class="dot">2</span><span>Work in a job, a course or a side project all count.</span></li>
-        <li><span class="dot">3</span><span>If you couldn't show it in an interview, don't claim it.</span></li>
-        <li><span class="dot">4</span><span>Nothing is stored. Nobody sees your answers. Be honest.</span></li>
+        <li><span class="dot">1</span><span>8 skills, one screen each. About 4 minutes.</span></li>
+        <li><span class="dot">2</span><span>After each skill, see what an interviewer would ask you.</span></li>
+        <li><span class="dot">3</span><span>Work in a job, a course or a side project all count.</span></li>
+        <li><span class="dot">4</span><span>If you couldn't show it in an interview, don't claim it.</span></li>
+        <li><span class="dot">5</span><span>Nothing is stored. Nobody sees your answers. Be honest.</span></li>
+        <li><span class="dot">6</span><span>At the end, discover your AI PM type.</span></li>
       </ul>
       <div class="muted" style="font-size:14px;margin-bottom:6px">For each skill, pick one level:</div>
       <div class="levels-preview">
@@ -195,6 +230,7 @@
     <div class="skill-head"><span class="skill-num" id="qNum">01</span><h2 class="skill-name" id="qName"></h2></div>
     <p class="skill-q" id="qQuestion"></p>
     <div class="options" id="qOptions" role="radiogroup"></div>
+    <div id="askCard" aria-live="polite"></div>
     <div class="q-nav">
       <button class="link-btn" id="backBtn" type="button">&larr; Back</button>
       <button class="link-btn" id="nextBtn" type="button" disabled>Next &rarr;</button>
@@ -204,10 +240,18 @@
   <!-- Result -->
   <section class="screen" id="result">
     <div class="result-head">
-      <div class="kicker">Your result</div>
+      <div class="badge-wrap">
+        <div class="burst" id="burst"></div>
+        <div class="badge" id="tBadge"></div>
+        <div class="type-kicker fade-up" id="tKicker">Your AI PM type</div>
+        <div class="type-name fade-up" id="tName"></div>
+        <p class="type-line fade-up" id="tLine"></p>
+      </div>
+      <div class="divider"></div>
+      <div class="kicker">Your evidence</div>
       <div class="big-stat" id="rStat"></div>
-      <span class="profile-pill" id="rProfile"></span>
-      <p class="profile-desc" id="rProfileDesc"></p>
+      <span class="profile-pill fade-up" id="rProfile"></span>
+      <p class="profile-desc fade-up" id="rProfileDesc"></p>
     </div>
     <div class="card radar-card">
       <svg id="radar" viewBox="0 0 420 330" role="img" aria-label="Radar chart of your 8 skill levels"></svg>
@@ -288,6 +332,37 @@ const SKILLS = [
     cohort: "Discovery, the AI PRD and the capstone" }
 ];
 
+const ASK = [
+  "Tell me about a time you decided not to use AI for a problem. Why?",
+  "Walk me through something you built with AI. What did it get wrong, and why?",
+  "How did you decide which information your AI was allowed to use?",
+  "How did you know your AI feature was good enough to launch?",
+  "What could go wrong with your AI feature, and when does a human step in?",
+  "Where exactly does AI fit into the user's work, and what happens when it fails?",
+  "Which AI option did you choose, and what did you give up to get it?",
+  "Tell me about a time people disagreed on an AI launch. What did you do?"
+];
+const ASK_NOTE = [
+  "You will meet this question in AI PM interviews. Your plan at the end will help you prepare.",
+  "Explaining the idea is a start. Interviewers want a real example you worked on.",
+  "Good start. Be ready to show the work behind it, not just describe it."
+];
+
+const ICONS = {
+  strategist: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>',
+  builder: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3 17.8V21h3.2l6.3-6.3a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg>',
+  guardian: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>',
+  balancer: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M7 21h10M5 7h14"/><path d="M5 7l-3 6a3 3 0 0 0 6 0zM19 7l-3 6a3 3 0 0 0 6 0z"/></svg>',
+  explorer: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>'
+};
+const TYPES = [
+  { key: "strategist", name: "The Product Strategist", pair: [0, 7], line: "You start with the right problem and get people behind the decision." },
+  { key: "builder",    name: "The AI Builder",         pair: [1, 5], line: "You know what the technology can do and how it fits into real work." },
+  { key: "guardian",   name: "The Quality Guardian",   pair: [2, 3], line: "You care whether the AI is right, not just whether it runs." },
+  { key: "balancer",   name: "The Risk Balancer",      pair: [4, 6], line: "You weigh safety, cost and speed before anyone else does." }
+];
+const EXPLORER = { key: "explorer", name: "The Explorer", line: "You are at the start of the map. Every skill is open ground, and that is a good place to begin." };
+
 const PROFILES = [
   { max: 8,  name: "Starting out",    gold: true,  desc: "You know where the gaps are, which is the right place to begin. One small project can move several skills at once." },
   { max: 16, name: "Building",        gold: true,  desc: "You can talk about most skills. The next step is turning that into evidence you can put in front of an interviewer." },
@@ -314,7 +389,7 @@ $("themeBtn").addEventListener("click", () => {
   document.documentElement.setAttribute("data-theme", next);
   try { localStorage.setItem("cb-sec-theme", next); } catch (e) {}
   paintThemeBtn();
-  if ($("result").classList.contains("active")) drawRadar();
+  if ($("result").classList.contains("active")) drawRadar(radarScale);
 });
 paintThemeBtn();
 
@@ -347,6 +422,7 @@ function renderQuestion() {
     box.appendChild(b);
   });
   $("backBtn").textContent = current === 0 ? "← Intro" : "← Back";
+  renderAsk(false);
   $("nextBtn").disabled = answers[current] === null;
   $("nextBtn").textContent = current === SKILLS.length - 1 ? "See result →" : "Next →";
 }
@@ -354,8 +430,38 @@ function renderQuestion() {
 function choose(i) {
   answers[current] = i;
   renderQuestion();
-  clearTimeout(advanceTimer);
-  advanceTimer = setTimeout(next, 320);
+  renderAsk(true);
+}
+
+const MIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+function renderAsk(scroll) {
+  const box = $("askCard");
+  const lv = answers[current];
+  if (lv === null) { box.innerHTML = ""; return; }
+  const last = current === SKILLS.length - 1;
+  const nextLabel = last ? "See my result →" : "Next skill →";
+  let h = '<div class="ask-card"><div class="ask-label">' + MIC + 'An interviewer would ask</div>' +
+          '<p class="ask-q">“' + esc(ASK[current]) + '”</p>';
+  if (lv === 3) {
+    h += '<p class="ask-note">Could you answer this with a real example right now?</p>' +
+         '<div class="ask-btns"><button class="btn btn-ghost" type="button" id="askNo">Not really</button>' +
+         '<button class="btn btn-primary" type="button" id="askYes">Yes, I could</button></div>';
+  } else {
+    h += '<p class="ask-note">' + ASK_NOTE[lv] + '</p>' +
+         '<button class="btn btn-primary ask-next" type="button" id="askNext">' + nextLabel + '</button>';
+  }
+  box.innerHTML = h + '</div>';
+  if (lv === 3) {
+    $("askYes").addEventListener("click", next);
+    $("askNo").addEventListener("click", () => {
+      answers[current] = 2;
+      toast("Moved to ‘Done it once’. Honest call.");
+      setTimeout(next, 700);
+    });
+  } else {
+    $("askNext").addEventListener("click", next);
+  }
+  if (scroll) setTimeout(() => box.scrollIntoView({ behavior: "smooth", block: "nearest" }), 60);
 }
 function next() {
   clearTimeout(advanceTimer);
@@ -385,7 +491,10 @@ function computeResult() {
   // Strengths: highest scores at level 2+, ties by deck order, excluding focus skills
   const strengths = idx.filter((i) => answers[i] >= 2 && (allMax || !focus.includes(i)))
     .sort((a, b) => answers[b] - answers[a] || a - b).slice(0, 2);
-  return { total, evidenceCount, profile, focus, allMax, strengths };
+  let type;
+  if (answers.every((a) => a <= 1)) type = EXPLORER;
+  else type = TYPES.slice().sort((a, b) => (answers[b.pair[0]] + answers[b.pair[1]]) - (answers[a.pair[0]] + answers[a.pair[1]]) || a.pair[0] - b.pair[0])[0];
+  return { total, evidenceCount, profile, focus, allMax, strengths, type };
 }
 
 /* ---------- Result ---------- */
@@ -393,12 +502,15 @@ function esc(t) { return String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<
 
 function renderResult() {
   const r = computeResult();
+  $("tBadge").innerHTML = ICONS[r.type.key];
+  $("tName").textContent = r.type.name;
+  $("tLine").textContent = r.type.line;
   $("rStat").innerHTML = "You have evidence for <em>" + r.evidenceCount + " of 8</em> skills";
   const pill = $("rProfile");
   pill.textContent = r.profile.name + " · " + r.total + "/24";
   pill.className = "profile-pill" + (r.profile.gold ? " gold" : "");
   $("rProfileDesc").textContent = r.profile.desc;
-  drawRadar();
+  playReveal(r);
   $("legend").innerHTML = SKILLS.map((s, i) => "<span>" + pad(i + 1) + " " + esc(s.short) + ": <b>" + LEVELS[answers[i]] + "</b></span>").join("");
 
   const fl = $("focusList");
@@ -414,6 +526,7 @@ function renderResult() {
         '<p class="why">' + esc(s.why) + '</p>' +
         '<div class="blk"><div class="blk-label">This week’s practice task</div><p>' + esc(s.task) + '</p></div>' +
         '<div class="blk"><div class="blk-label">Evidence to build</div><p>' + esc(s.evidence) + '</p></div>' +
+        '<div class="ask-mini"><b>Prepare for this interview question</b>“' + esc(ASK[i]) + '”</div>' +
         '<div class="cohort">In the Codebasics AI PM Bootcamp, this is practised in ' + esc(s.cohort) + '.</div>' +
         '</div>';
     }).join("");
@@ -431,6 +544,42 @@ function renderResult() {
   }
 }
 
+const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let revealTimers = [];
+function playReveal(r) {
+  revealTimers.forEach(clearTimeout); revealTimers = [];
+  const badge = $("tBadge"), fades = ["tKicker", "tName", "tLine", "rProfile", "rProfileDesc"].map($);
+  badge.classList.remove("pop"); fades.forEach((el) => el.classList.remove("show")); $("burst").innerHTML = "";
+  const pill = $("rProfile");
+  if (reduceMotion) { badge.classList.add("pop"); fades.forEach((el) => el.classList.add("show")); drawRadar(1); return; }
+  drawRadar(0);
+  void badge.offsetWidth;
+  const T = (fn, ms) => revealTimers.push(setTimeout(fn, ms));
+  T(() => { badge.classList.add("pop"); burst(); }, 250);
+  T(() => $("tKicker").classList.add("show"), 600);
+  T(() => $("tName").classList.add("show"), 750);
+  T(() => $("tLine").classList.add("show"), 950);
+  T(() => {
+    const start = performance.now(), dur = 900;
+    const step = (now) => {
+      const k = Math.min(1, (now - start) / dur), e = 1 - Math.pow(1 - k, 3);
+      drawRadar(e);
+      pill.textContent = r.profile.name + " · " + Math.round(r.total * e) + "/24";
+      if (k < 1) requestAnimationFrame(step);
+    };
+    pill.classList.add("show"); requestAnimationFrame(step);
+  }, 1100);
+  T(() => $("rProfileDesc").classList.add("show"), 1500);
+}
+function burst() {
+  const b = $("burst"); let h = "";
+  for (let k = 0; k < 18; k++) {
+    const a = (k / 18) * Math.PI * 2, d = 70 + Math.random() * 50;
+    h += '<i style="--dx:' + (Math.cos(a) * d).toFixed(0) + 'px;--dy:' + (Math.sin(a) * d).toFixed(0) + 'px;animation-delay:' + (Math.random() * 0.12).toFixed(2) + 's"></i>';
+  }
+  b.innerHTML = h;
+}
+
 function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
 
 function radarGeometry(cx, cy, R) {
@@ -441,7 +590,9 @@ function radarGeometry(cx, cy, R) {
   }).map((g) => ({ ...g, x: (lv) => cx + g.cos * R * lv / 3, y: (lv) => cy + g.sin * R * lv / 3 }));
 }
 
-function drawRadar() {
+let radarScale = 1;
+function drawRadar(scale) {
+  if (typeof scale === "number") radarScale = scale;
   const svg = $("radar");
   const cx = 210, cy = 165, R = 112;
   const G = radarGeometry(cx, cy, R);
@@ -454,7 +605,7 @@ function drawRadar() {
   for (let lv = 1; lv <= 3; lv++) {
     h += '<text x="' + (cx + 4) + '" y="' + (cy - R * lv / 3 + 11) + '" font-size="10" fill="' + muted + '">' + lv + '</text>';
   }
-  const vals = answers.map((a) => (a === null ? 0 : a));
+  const vals = answers.map((a) => (a === null ? 0 : a) * radarScale);
   // Draw a tiny minimum so a zero still shows a visible shape at the centre
   const pts = G.map((g, i) => { const v = Math.max(vals[i], 0.08); return g.x(v).toFixed(1) + "," + g.y(v).toFixed(1); }).join(" ");
   h += '<polygon points="' + pts + '" fill="' + fill + '" stroke="' + green + '" stroke-width="2.5" stroke-linejoin="round"/>';
@@ -472,7 +623,7 @@ function drawRadar() {
 /* ---------- Copy as text ---------- */
 function planText() {
   const r = computeResult();
-  let t = "My AI PM Skill Evidence Check\n";
+  let t = "My AI PM Skill Evidence Check\nMy AI PM type: " + r.type.name + "\n";
   t += "Evidence for " + r.evidenceCount + " of 8 skills · " + r.profile.name + " (" + r.total + "/24)\n\n";
   SKILLS.forEach((s, i) => { t += pad(i + 1) + " " + s.name + ": " + LEVELS[answers[i]] + "\n"; });
   t += "\n";
@@ -483,7 +634,8 @@ function planText() {
       const s = SKILLS[i];
       t += "FOCUS " + (k + 1) + ": " + s.name + "\n";
       t += "This week: " + s.task + "\n";
-      t += "Evidence to build: " + s.evidence + "\n\n";
+      t += "Evidence to build: " + s.evidence + "\n";
+      t += "Interview question to prepare: " + ASK[i] + "\n\n";
     });
   }
   t += "Codebasics · 8 Skills to get hired as an AI PM";
@@ -524,9 +676,9 @@ async function buildImage() {
   // Measure pass to size canvas height
   const tmp = document.createElement("canvas").getContext("2d");
   const focusBlocks = r.allMax ? [] : r.focus.map((i) => SKILLS[i]);
-  let est = 1080;
+  let est = 1160;
   tmp.font = "400 28px " + F;
-  focusBlocks.forEach((s) => { est += 150 + wrapLines(tmp, s.task, W - PADX * 2 - 60).length * 40; });
+  focusBlocks.forEach((s) => { const i = SKILLS.indexOf(s); est += 250 + wrapLines(tmp, s.task, W - PADX * 2 - 60).length * 40 + wrapLines(tmp, ASK[i], W - PADX * 2 - 60).length * 36; });
   if (r.allMax) est += 220;
   const H = Math.max(1350, est + 90);
 
@@ -543,10 +695,12 @@ async function buildImage() {
   w += ctx.measureText(r.evidenceCount + " of 8").width;
   ctx.fillStyle = C.text; ctx.fillText(" skills", PADX + w, 170);
   ctx.fillStyle = r.profile.gold ? C.gold : C.green; ctx.font = "600 32px " + F;
-  ctx.fillText(r.profile.name + " · " + r.total + "/24", PADX, 222);
+  ctx.fillText(r.profile.name + " \u00b7 " + r.total + "/24", PADX, 222);
+  ctx.fillStyle = C.muted; ctx.font = "500 26px " + F; ctx.fillText("My AI PM type", PADX, 286);
+  ctx.fillStyle = C.green; ctx.font = "600 40px " + F; ctx.fillText(r.type.name, PADX, 334);
 
   // Radar
-  const cx = W / 2, cy = 560, R = 220;
+  const cx = W / 2, cy = 650, R = 210;
   const G = radarGeometry(cx, cy, R);
   ctx.strokeStyle = C.line; ctx.lineWidth = 2;
   for (let lv = 1; lv <= 3; lv++) {
@@ -566,7 +720,7 @@ async function buildImage() {
   });
   ctx.textAlign = "left";
 
-  let y = 900;
+  let y = 980;
   ctx.fillStyle = C.text; ctx.font = "600 36px " + F;
   ctx.fillText(r.allMax ? "My next step" : "My 2 focus skills", PADX, y); y += 30;
   if (r.allMax) {
@@ -577,7 +731,9 @@ async function buildImage() {
     const i = SKILLS.indexOf(s);
     ctx.font = "400 28px " + F;
     const taskLines = wrapLines(ctx, s.task, W - PADX * 2 - 60);
-    const boxH = 150 + taskLines.length * 40;
+    ctx.font = "italic 400 26px " + F;
+    const askLines = wrapLines(ctx, "“" + ASK[i] + "”", W - PADX * 2 - 60);
+    const boxH = 236 + taskLines.length * 40 + askLines.length * 36;
     y += 24;
     ctx.fillStyle = C.surface; ctx.fillRect(PADX, y, W - PADX * 2, boxH);
     ctx.fillStyle = C.gold; ctx.fillRect(PADX, y, 8, boxH);
@@ -591,6 +747,9 @@ async function buildImage() {
     taskLines.forEach((l, k) => ctx.fillText(l, PADX + 34, ty + k * 40));
     ty += taskLines.length * 40;
     ctx.fillStyle = C.muted; ctx.font = "500 24px " + F; ctx.fillText("Evidence to build: " + s.evidence, PADX + 34, ty + 2);
+    ty += 52; ctx.fillStyle = C.green; ctx.font = "600 22px " + F; ctx.fillText("INTERVIEWER ASKS", PADX + 34, ty);
+    ty += 36; ctx.fillStyle = C.text; ctx.font = "italic 400 26px " + F;
+    askLines.forEach((l, k) => ctx.fillText(l, PADX + 34, ty + k * 36));
     y += boxH;
   });
   ctx.fillStyle = C.muted; ctx.font = "400 22px " + F;
